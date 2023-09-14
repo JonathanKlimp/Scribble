@@ -2,8 +2,13 @@ import java.awt.*;
 
 public class Rectangle extends Figure{
 
+    public Rectangle(Color color) {
+        super(color);
+    }
+
     @Override
-    public void draw(Graphics g) {
+    public void draw(Graphics g, Color color) {
+        g.setColor(color);
         if (x1 > x2) {
             int temp = x1;
             x1 = x2;
@@ -14,6 +19,10 @@ public class Rectangle extends Figure{
             y1 = y2;
             y2 = temp;
         }
-        g.drawRect(x1, y1, x2-x1, y2-y1);
+        if (fill) {
+            g.fillRect(x1, y1, x2-x1, y2-y1);
+        } else {
+            g.drawRect(x1, y1, x2-x1, y2-y1);
+        }
     }
 }

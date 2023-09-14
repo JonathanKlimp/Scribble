@@ -9,9 +9,13 @@ public class Scribble extends JFrame implements MouseListener, MouseMotionListen
     static JMenuBar mb;
 
     static JMenu x;
-    static JMenuItem m1, m2, m3, m4;
-    int lastClickedX;
-    int lastCLickedY;
+    static JMenuItem m1, m2, m3, m4, m5, m6;
+    static JCheckBox checkBox;
+    static JCheckBox checkBoxText;
+    int firstClickedX;
+    int firstCLickedY;
+    boolean fill = false;
+    boolean text = false;
     Figure figure;
     Color color;
     Shapes shape = Shapes.RECTANGLE;
@@ -19,19 +23,22 @@ public class Scribble extends JFrame implements MouseListener, MouseMotionListen
 
     public Scribble() throws HeadlessException {
         addMouseListener(this);
+        addMouseMotionListener(this);
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        for (Figure f : figures){
-            g.setColor(color);
-            f.draw(g);
-        }
+//        if (text) {
+            for (Figure f : figures){
+                f.draw(g, f.color);
+            }
+//        } else {
+//            g.drawString("TESTING", firstClickedX, firstCLickedY);
+//        }
     }
 
     public static void main(String[] args) {
-        // write your code here
         Scribble scribble = new Scribble();
 
         scribble.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -40,44 +47,66 @@ public class Scribble extends JFrame implements MouseListener, MouseMotionListen
         button.setPreferredSize(new Dimension(30, 30));
         button.addActionListener(scribble);
 
+        checkBox = new JCheckBox("Fill");
+        checkBox.addActionListener(scribble);
+
         mb = new JMenuBar();
         x = new JMenu("Menu");
         m1 = new JMenuItem("Line");
         m2 = new JMenuItem("Rectangle");
         m3 = new JMenuItem("Triangle");
         m4 = new JMenuItem("Oval");
+        m5 = new JMenuItem("Pyramid");
+        m6 = new JMenuItem("StringBox");
         m1.addActionListener(scribble);
         m2.addActionListener(scribble);
         m3.addActionListener(scribble);
         m4.addActionListener(scribble);
+        m5.addActionListener(scribble);
+        m6.addActionListener(scribble);
 
         x.add(m1);
         x.add(m2);
         x.add(m3);
         x.add(m4);
+        x.add(m5);
+        x.add(m6);
 
         mb.add(x);
         scribble.setJMenuBar(mb);
         scribble.add(button, BorderLayout.NORTH);
-        scribble.setSize(400, 400);
+        scribble.add(checkBox, BorderLayout.SOUTH);
+        scribble.setSize(500, 500);
         scribble.setVisible(true);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         switch (shape) {
-            case RECTANGLE -> figure = new Rectangle();
-            case LINE -> figure = new Line();
-            case OVAL -> figure = new Oval();
-            case TRIANGLE -> figure = new Triangle();
+            case RECTANGLE ->  {
+                figure = new Rectangle(color);
+                figure.fill = fill;
+            }
+            case LINE -> figure = new Line(color);
+            case OVAL -> {
+                figure = new Oval(color);
+                figure.fill = fill;
+            }
+            case TRIANGLE -> {
+                figure = new Triangle(color);
+                figure.fill = fill;
+            }
+            case PYRAMID -> figure = new Pyramid(color);
+            case STRINGBOX -> {
+                figure = new StringBox(color);
+                figure.title = "hoi ik ben aan het testen";
+            }
         }
         if (figure == null) {
             return;
         }
-        figure.x1 = e.getX();
-        figure.y1 = e.getY();
-        lastClickedX = e.getX();
-        lastCLickedY = e.getY();
+        firstClickedX = e.getX();
+        firstCLickedY = e.getY();
     }
 
     @Override
@@ -89,7 +118,6 @@ public class Scribble extends JFrame implements MouseListener, MouseMotionListen
         figure.x2 = e.getX();
         figure.y2 = e.getY();
         repaint();
-
     }
 
     @Override
@@ -110,11 +138,10 @@ public class Scribble extends JFrame implements MouseListener, MouseMotionListen
     public void mouseDragged(MouseEvent e) {
         figure.x2 = e.getX();
         figure.y2 = e.getY();
-//        figure.x1 = lastClickedX;
-//        figure.x2 = lastCLickedY;
+        figure.x1 = firstClickedX;
+        figure.y1 = firstCLickedY;
         figures.add(figure);
         repaint();
-
     }
 
     @Override
@@ -137,11 +164,18 @@ public class Scribble extends JFrame implements MouseListener, MouseMotionListen
         if (s.equals("Line")) {
             shape = Shapes.LINE;
         }
+        if (s.equals("Pyramid")) {
+            shape = Shapes.PYRAMID;
+        }
+        if (s.equals("StringBox")) {
+            shape = Shapes.STRINGBOX;
+        }
         if (s.equals("color")) {
-            Color initialcolor = Color.RED;
             color = JColorChooser.showDialog(this,
-                    "Select a color", initialcolor);
-
+                    "Select a color", Color.WHITE);
+        }
+        if (s.equals("Fill")) {
+            fill = !fill;
         }
     }
 }

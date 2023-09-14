@@ -2,5 +2,7 @@ public enum Shapes {
     RECTANGLE,
     TRIANGLE,
     OVAL,
-    LINE
+    LINE,
+    PYRAMID,
+    STRINGBOX
 }
